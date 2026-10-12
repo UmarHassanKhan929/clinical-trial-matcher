@@ -1,0 +1,14 @@
+BUILD_GUIDE.md
+
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+.env
+.DS_Store
+.idea/
+.vscode/
+
+# real patient data (PHI) should NEVER BE PUSHED. Use synthetic data only.
+real_data/
