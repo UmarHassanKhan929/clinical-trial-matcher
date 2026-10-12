@@ -1,0 +1,5 @@
+<div class="registered">
+  <b>Registered &#10003;</b> (HTTP {{ status }}{% if status == 200 %} &mdash; already existed, same resource returned{% endif %})
+  <code>{{ subject.id }}</code>
+  <div class="hint">ResearchSubject &middot; status {{ subject.status }} &middot; {{ subject.study.reference }} &middot; {{ subject.individual.reference }}</div>
+</div>

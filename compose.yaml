@@ -1,0 +1,8 @@
+services:
+  app:
+    build: .
+    image: clinical-trial-matcher
+    container_name: clinical-trial-matcher
+    ports:
+      - "8000:8000"
+    restart: unless-stopped

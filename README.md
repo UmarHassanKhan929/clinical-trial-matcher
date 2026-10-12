@@ -42,6 +42,7 @@ Condition, Observation) ─► Stage 1: hard gates ── fail ──► INELIGI
 | `app/stage2.py` | Criteria splitting + regex rules (FR-4) |
 | `app/scoring.py` | Verdict + score (FR-5) |
 | `app/main.py` | FastAPI endpoints, idempotent `ResearchSubject` (FR-6) |
+| `app/ui.py` | htmx UI at `/`: match form + candidate registration |
 
 ## Output contract
 
@@ -85,10 +86,10 @@ pip install -r requirements-dev.txt
 
 pytest -v                  # run the test suite
 python scripts/demo.py     # offline demo on bundled sample data
-uvicorn app.main:app --reload   # API + docs at http://localhost:8000/docs
+uvicorn app.main:app --reload   # web UI at http://localhost:8000 · API docs at /docs
 ```
 
-Docker:
+Docker (or `docker compose up --build` for the same thing with a restart policy):
 
 ```bash
 docker build -t clinical-trial-matcher .

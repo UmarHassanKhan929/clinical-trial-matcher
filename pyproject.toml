@@ -21,4 +21,4 @@ select = ["E", "F", "I", "UP", "B"]
 ignore = ["UP042"]  # (str, Enum) keeps JSON/Pydantic behaviour explicit and works on 3.11+
 
 [tool.ruff.lint.flake8-bugbear]
-extend-immutable-calls = ["fastapi.Depends", "fastapi.Query"]
+extend-immutable-calls = ["fastapi.Depends", "fastapi.Query", "fastapi.Form", "fastapi.File"]

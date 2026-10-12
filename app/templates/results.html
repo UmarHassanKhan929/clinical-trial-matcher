@@ -1,0 +1,42 @@
+<div class="summary">
+  <strong>{{ resp.results | length }}</strong> stud{{ 'y' if resp.results|length == 1 else 'ies' }} evaluated for patient
+  <code>{{ resp.patient_id }}</code> &middot; as of {{ resp.as_of }}
+</div>
+{% if not resp.results %}
+  <div class="empty">No recruiting studies matched the patient's active conditions.</div>
+{% endif %}
+{% for r in resp.results %}
+<article class="card v-{{ r.verdict.value | lower }}">
+  <div class="card-head">
+    <span class="badge b-{{ r.verdict.value | lower }}">{{ r.verdict.value }}</span>
+    <span class="score">{{ '%.0f' | format(r.score * 100) }}%</span>
+  </div>
+  <h3>{{ r.title }}<span class="nct">{{ r.nct_id }}</span></h3>
+  <div class="gates">
+    {% for g in r.gates %}
+    <span class="gate {{ 'ok' if g.passed else 'bad' }}">
+      <b>{{ '✓' if g.passed else '✗' }} {{ g.name }}</b> &mdash; {{ g.evidence }}
+    </span>
+    {% endfor %}
+  </div>
+  {% if r.criteria %}
+  <ul class="criteria">
+    {% for c in r.criteria %}
+    <li>
+      <span class="tag">{{ 'INCL' if c.type.value == 'INCLUSION' else 'EXCL' }}</span>
+      <span class="st st-{{ c.status.value | lower }}">{{ c.status.value }}</span>
+      <span>
+        <span class="crit-text">{{ c.text }}</span><br>
+        <span class="crit-evidence">{{ c.evidence }}</span>
+      </span>
+    </li>
+    {% endfor %}
+  </ul>
+  {% endif %}
+  <form hx-post="/candidates-ui" hx-target="this" hx-swap="outerHTML">
+    <input type="hidden" name="patientId" value="{{ resp.patient_id }}">
+    <input type="hidden" name="nctId" value="{{ r.nct_id }}">
+    <button type="submit">Register candidate</button>
+  </form>
+</article>
+{% endfor %}

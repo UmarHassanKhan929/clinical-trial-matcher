@@ -1,26 +1,22 @@
-"""FastAPI service: /match (FR-1..5) and /candidates (FR-6)."""
+"""FastAPI service: /match (FR-1..5) and /candidates (FR-6), plus the htmx UI at /."""
 
 from __future__ import annotations
 
-import uuid
 from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import date
+from pathlib import Path
 from typing import Any
 
 import httpx
 from fastapi import Depends, FastAPI, HTTPException, Query, Request, Response
+from fastapi.staticfiles import StaticFiles
 
 from . import __version__
-from .fhir_study import from_research_study
 from .ingestion import TrialRepository
-from .matcher import evaluate
-from .patient import parse_bundle
-from .schemas import MatchRequest, MatchResponse, RegistrationRequest, Verdict
-
-_VERDICT_RANK = {Verdict.ELIGIBLE: 0, Verdict.POTENTIAL: 1, Verdict.INELIGIBLE: 2}
-# Fixed namespace => the same (patient, trial) pair always yields the same ResearchSubject id.
-_SUBJECT_NAMESPACE = uuid.UUID("6f1e1b7e-0f0e-4d57-9a53-3a6b0f3c2d11")
+from .schemas import MatchRequest, MatchResponse, RegistrationRequest
+from .service import get_repository, register_subject, run_match
+from .ui import router as ui_router
 
 
 @asynccontextmanager
@@ -38,9 +34,8 @@ app = FastAPI(
 )
 app.state.subjects = {}  # in-memory ResearchSubject store (swap for a FHIR server / DB in production)
 
-
-def get_repository(request: Request) -> TrialRepository:
-    return request.app.state.repo
+app.include_router(ui_router)
+app.mount("/static", StaticFiles(directory=Path(__file__).resolve().parent / "static"), name="static")
 
 
 @app.get("/health")
@@ -55,44 +50,16 @@ async def match(
     repo: TrialRepository = Depends(get_repository),
 ) -> MatchResponse:
     try:
-        patient = parse_bundle(req.bundle)
+        return await run_match(req.bundle, req.as_of or date.today(), include_ineligible, repo)
     except ValueError as exc:
         raise HTTPException(status_code=422, detail=str(exc)) from exc
-
-    terms = patient.search_terms()
-    if not terms:
-        raise HTTPException(status_code=422, detail="Patient has no active conditions to search trials for.")
-
-    as_of = req.as_of or date.today()
-    studies: dict[str, dict[str, Any]] = {}
-    try:
-        for term in terms:
-            for resource in await repo.recruiting_for(term):
-                studies[resource["id"]] = resource
     except httpx.HTTPError as exc:
         raise HTTPException(status_code=502, detail=f"ClinicalTrials.gov request failed: {exc}") from exc
-
-    results = [evaluate(from_research_study(rs), patient, as_of) for rs in studies.values()]
-    if not include_ineligible:
-        results = [r for r in results if r.verdict is not Verdict.INELIGIBLE]
-    results.sort(key=lambda r: (_VERDICT_RANK[r.verdict], -r.score, r.nct_id))
-    return MatchResponse(patient_id=patient.id, as_of=as_of, results=results)
 
 
 @app.post("/candidates", status_code=201)
 def register_candidate(req: RegistrationRequest, request: Request, response: Response) -> dict[str, Any]:
     """Idempotent: 201 the first time, 200 with the identical resource on every repeat."""
-    subject_id = str(uuid.uuid5(_SUBJECT_NAMESPACE, f"{req.patient_id}|{req.nct_id}"))
-    store: dict[str, dict[str, Any]] = request.app.state.subjects
-    if subject_id in store:
-        response.status_code = 200
-        return store[subject_id]
-    subject = {
-        "resourceType": "ResearchSubject",
-        "id": subject_id,
-        "status": "candidate",
-        "study": {"reference": f"ResearchStudy/{req.nct_id}"},
-        "individual": {"reference": f"Patient/{req.patient_id}"},
-    }
-    store[subject_id] = subject
+    subject, status = register_subject(req.patient_id, req.nct_id, request.app.state.subjects)
+    response.status_code = status
     return subject
