@@ -1,0 +1,44 @@
+{
+    "studies": [
+      {
+        "protocolSection": {
+          "identificationModule": {"nctId": "NCT04551066", "briefTitle": "Disease-Modifying Therapy in Early Parkinson's Disease"},
+          "statusModule": {"overallStatus": "RECRUITING"},
+          "conditionsModule": {"conditions": ["Parkinson Disease"]},
+          "eligibilityModule": {
+            "sex": "ALL",
+            "minimumAge": "40 Years",
+            "maximumAge": "85 Years",
+            "eligibilityCriteria": "Inclusion Criteria:\n\n* Age 50 to 80 years at screening\n* Diagnosis of Parkinson's Disease\n* Hoehn and Yahr stage 1 or 2\n\nExclusion Criteria:\n\n* History of ischemic stroke\n* Serum creatinine > 1.8 mg/dL\n* HbA1c > 9%\n* Pregnant or breastfeeding\n"
+          }
+        }
+      },
+      {
+        "protocolSection": {
+          "identificationModule": {"nctId": "NCT05000002", "briefTitle": "Hormone Therapy Study in Postmenopausal Women with Parkinson's Disease"},
+          "statusModule": {"overallStatus": "RECRUITING"},
+          "conditionsModule": {"conditions": ["Parkinson Disease"]},
+          "eligibilityModule": {
+            "sex": "FEMALE",
+            "minimumAge": "45 Years",
+            "maximumAge": "N/A",
+            "eligibilityCriteria": "Inclusion Criteria:\n\n* Postmenopausal\n\nExclusion Criteria:\n\n* Breast cancer\n"
+          }
+        }
+      },
+      {
+        "protocolSection": {
+          "identificationModule": {"nctId": "NCT05000003", "briefTitle": "Gene Therapy for Parkinson's Disease (Not Yet Open)"},
+          "statusModule": {"overallStatus": "NOT_YET_RECRUITING"},
+          "conditionsModule": {"conditions": ["Parkinson Disease"]},
+          "eligibilityModule": {
+            "sex": "ALL",
+            "minimumAge": "30 Years",
+            "maximumAge": "N/A",
+            "eligibilityCriteria": "Inclusion Criteria:\n\n* Diagnosis of Parkinson's Disease\n"
+          }
+        }
+      }
+    ]
+  }
+  
