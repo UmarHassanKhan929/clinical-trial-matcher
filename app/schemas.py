@@ -7,6 +7,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field
 from pydantic.alias_generators import to_camel
 
+
 class CamelModel(BaseModel):
     """snake_case in Python, camelCase on the wire (matches FHIR conventions)."""
 
