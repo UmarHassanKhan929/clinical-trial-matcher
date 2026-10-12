@@ -4,6 +4,8 @@ A deterministic, explainable clinical trial prescreening engine built for HL7 FH
 
 [![CI](https://github.com/UmarHassanKhan929/clinical-trial-matcher/actions/workflows/ci.yml/badge.svg)](https://github.com/UmarHassanKhan929/clinical-trial-matcher/actions)
 
+![Offline demo on bundled sample data](docs/demo.gif)
+
 > **Educational / portfolio project. Not a medical device and not for clinical use.** It uses a small starter terminology dictionary and synthetic sample data. Never commit real patient data (PHI).
 
 ---
